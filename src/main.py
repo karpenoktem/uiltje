@@ -34,7 +34,7 @@ class Icon(wx.TaskBarIcon):
         self.create_menu()
         self.program = program
     def set_state(self, state):
-        self.SetIcon(self.icon_state_map[state], 'KNTray')
+        self.SetIcon(self.icon_state_map[state], 'Uiltje')
         if state == STATE_CONNECTED:
             self.conn_toggle.Enable(True)
             self.conn_toggle.SetText('Verbreek &verbinding')
