@@ -6,11 +6,14 @@ TAP_NAME = 'tap0901'
 
 l = logging.getLogger(__name__)
 
+def _get_tap_status():
+    return subprocess.check_output([static_path('tap/tapinstall'), 'status',
+                                    '*%s*' % TAP_NAME],
+                                    startupinfo=subprocess_sui)
+
 def ensure_tap_installed():
-    output = subprocess.check_output([static_path('tap/tapinstall'), 'status',
-                                     '*%s*' % TAP_NAME],
-                                     startupinfo=subprocess_sui)
-    if 'No matching devices found' in output:
+    # XXX Does this work on non-english Windows?
+    if 'No matching devices found' in _get_tap_status():
         l.info('No tap device found -- installing')
         install_tap()
     else:
@@ -22,8 +25,14 @@ def install_tap():
                                      startupinfo=subprocess_sui)
 
 def remove_tap():
-    subprocess.call([static_path('tap/tapinstall'), 'remove', TAP_NAME],
+    # Only remove tap if there is a single tap running.
+    # XXX Does this work on non-english Windows?
+    if '1 matching device(s) found.' in _get_tap_status():
+        l.info('removing single tap device')
+        subprocess.call([static_path('tap/tapinstall'), 'remove', TAP_NAME],
                                      startupinfo=subprocess_sui)
+    else:
+        l.info('several tap devices found - not removing any of them')
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

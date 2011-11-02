@@ -4,7 +4,7 @@ import subprocess
 from utils import onWindows, var_path, static_path, subprocess_sui
 
 if onWindows:
-    from win_tap import ensure_tap_installed
+    from win_tap import ensure_tap_installed, remove_tap
 
 l = logging.getLogger(__name__)
 
@@ -29,10 +29,11 @@ class OpenVPNConnection(object):
             if "Initialization Sequence Completed" in line:
                 if self.on_connected:
                     self.on_connected()
-        # XXX Should we remove the TAP device after use?
     def stop(self):
         if self.p:
             self.p.kill()
+        if onWindows:
+            remove_tap()
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
