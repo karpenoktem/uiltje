@@ -25,10 +25,10 @@ class OpenVPNConnection(object):
             if line == '':
                 break
             line = line.strip()
+            l.debug(line)
             if "Initialization Sequence Completed" in line:
                 if self.on_connected:
                     self.on_connected()
-            l.debug(line)
         # XXX Should we remove the TAP device after use?
     def stop(self):
         if self.p:
