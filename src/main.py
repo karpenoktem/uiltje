@@ -7,7 +7,7 @@ import os.path
 import threading
 import subprocess
 
-from utils import static_path
+from utils import static_path, var_path
 from openvpn import OpenVPNConnection
 
 IP_PHASSA = '10.18.0.1'
@@ -115,4 +115,9 @@ class Program(object):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+    fileHandler = logging.FileHandler(var_path('log.txt'), mode='a')
+    formatter = logging.Formatter(
+        "%(asctime)s %(name)s %(levelname)s %(message)s")
+    fileHandler.setFormatter(formatter)
+    logging.root.addHandler(fileHandler)
     Program().main()
