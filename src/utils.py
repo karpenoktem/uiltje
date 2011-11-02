@@ -4,14 +4,23 @@ import os.path
 import platform
 import subprocess
 
-def data_path(pth):
+def var_path(pth):
     # Normal case
     if not sys.executable.endswith('pythonw.exe'):
         return os.path.join(os.path.abspath(os.path.dirname(sys.executable)),
-                            'data', pth)
+                            'var', pth)
     # For debugging
     return os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), '..',
-                        'data', pth))
+                        'var', pth))
+
+def static_path(pth):
+    # Normal case
+    if not sys.executable.endswith('pythonw.exe'):
+        return os.path.join(os.path.abspath(os.path.dirname(sys.executable)),
+                            'static', pth)
+    # For debugging
+    return os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), '..',
+                        'static', pth))
 
 onWindows = platform.system() == 'Windows'
 

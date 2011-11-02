@@ -7,7 +7,7 @@ import os.path
 import threading
 import subprocess
 
-from utils import data_path
+from utils import static_path
 from openvpn import OpenVPNConnection
 
 IP_PHASSA = '10.18.0.1'
@@ -25,11 +25,11 @@ class Icon(wx.TaskBarIcon):
     def __init__(self, program):
         super(Icon, self).__init__()
         self.icon_state_map = {
-            STATE_CONNECTED: wx.Icon(data_path('enabled.png'),
+            STATE_CONNECTED: wx.Icon(static_path('enabled.png'),
                                      wx.BITMAP_TYPE_PNG),
-            STATE_UNKNOWN: wx.Icon(data_path('unknown.png'),
+            STATE_UNKNOWN: wx.Icon(static_path('unknown.png'),
                                    wx.BITMAP_TYPE_PNG),
-            STATE_DISCONNECTED: wx.Icon(data_path('disabled.png'),
+            STATE_DISCONNECTED: wx.Icon(static_path('disabled.png'),
                                         wx.BITMAP_TYPE_PNG) }
         self.create_menu()
         self.program = program
