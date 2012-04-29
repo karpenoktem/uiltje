@@ -85,8 +85,9 @@ class Program(object):
             self.config['got-creds'] = True
         except fetchCert.AuthFailed:
             self.set_state(STATE_PROMPTING_CREDS)
-            # TODO add notice that the credentials were wrong
-            LoginDialog(self._loginDialog_callback)
+            LoginDialog(self._loginDialog_callback,
+                        message="De gebruikersnaam of "+
+                                "het wachtwoord is verkeerd")
             return
         self.set_state(STATE_UNKNOWN)
         self._start_vpn_worker()

@@ -11,7 +11,7 @@ MENU_FILES = wx.NewId()
 l = logging.getLogger(__name__)
 
 class LoginDialog(wx.Dialog):
-    def __init__(self, callback):
+    def __init__(self, callback, message=None):
         super(LoginDialog, self).__init__(None,
                                           title="Uiltje login")
         # Create controls
@@ -36,6 +36,9 @@ class LoginDialog(wx.Dialog):
         hbox.Add(loginButton)
         hbox.Add(cancelButton, flag=wx.LEFT, border=5)
         vbox.Add(panel, proportion=1, flag=wx.ALL|wx.EXPAND, border=5)
+        if message:
+            msg_l = wx.StaticText(self, wx.ID_ANY, message)
+            vbox.Add(msg_l, flag=wx.ALIGN_CENTER, border=10)
         vbox.Add(hbox, flag=wx.ALIGN_CENTER|wx.TOP|wx.BOTTOM, border=10)
         self.SetSizerAndFit(vbox)
 
