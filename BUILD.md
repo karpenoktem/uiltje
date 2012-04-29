@@ -21,11 +21,11 @@ You will need
 
 First, test Uiltje from source.  Run:
 
-   path\to\python.exe main.py
+    path\to\python.exe main.py
 
 Then create the stand-alone EXE:
 
-   path\to\python.exe path\to\pyinstaller.py main.spec
+    path\to\python.exe path\to\pyinstaller.py main.spec
 
 pyinstaller will put the EXE in dist/main.  Test it.  Then right-click on
 Uiltje.nsi and select "Compile NSI Script".  That's it.
