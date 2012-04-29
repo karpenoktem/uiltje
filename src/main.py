@@ -9,7 +9,7 @@ import subprocess
 
 from common import *
 
-from utils import static_path, var_path, onWindows, subprocess_sui
+from utils import static_path, var_path, which, onWindows, subprocess_sui
 from openvpn import OpenVPNConnection
 from ui import Icon
 
@@ -49,6 +49,8 @@ class Program(object):
                 if self.quiting:
                     return
         self.set_state(STATE_CONNECTED)
+        if not onWindows and which('gvfs-mount') is not None:
+            subprocess.call(['gvfs-mount', 'smb://'+ SMB_HOSTNAME])
         if self.open_files_on_connection:
             self._show_files()
             self.open_files_on_connection = False
@@ -87,8 +89,16 @@ class Program(object):
         if onWindows:
             l.info("calling explorer")
             # WTF adding startupinfo breaks this.
-        # TODO implement for other platforms
             subprocess.call(['explorer', '\\\\' + SMB_HOSTNAME])
+        else:
+            attempts = [['gnome-open', 'smb://'+ SMB_HOSTNAME], ['nautilus', 'smb://'+ SMB_HOSTNAME]]
+            for args in attempts:
+                exepath = which(args[0])
+                if exepath is not None:
+                    l.info("Starting %s", exepath)
+                    subprocess.call([exepath] + args[1:])
+                    return
+            l.warning("Could not found filebrowser")
     def toggle_connection(self):
         if self.state == STATE_CONNECTED:
             self.set_state(STATE_UNKNOWN)
