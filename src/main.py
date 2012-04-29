@@ -39,9 +39,9 @@ class Program(object):
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE,
                                         startupinfo=subprocess_sui)
-                out, code = pipe.communicate()
-                # WTF in some instances code != pipe.returncode.  Is this
-                # a bug of Python?
+                out, err = pipe.communicate()
+                if len(err) > 0:
+                    l.debug(err)
                 if pipe.returncode == 0:
                     break
                 l.debug("returncode: %s", pipe.returncode)
