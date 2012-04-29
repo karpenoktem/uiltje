@@ -1,4 +1,6 @@
 SMB_HOSTNAME='files.vpn.karpenoktem.nl'
+CERT_DOWNLOAD_URI = 'https://www.karpenoktem.nl/smoelen/ik/openvpn/openvpn'+ \
+                        '-config-%s.zip'
 
 STATE_UNKNOWN = 0
 STATE_CONNECTED = 1

@@ -1,32 +1,34 @@
-from base64 import b64encode
-from urllib2 import Request, urlopen, HTTPError
+import logging
+import os.path
+import json
 
-class AuthenticationFailed(Exception):
-	pass
+from utils import var_path
 
-class InternalError(Exception):
-	pass
+l = logging.getLogger(__name__)
 
-
-def download(user, password):
-	req = Request('https://www.karpenoktem.nl/smoelen/ik/openvpn/openvpn-config-%s.zip' % user)
-	req.add_header("Authorization", "Basic %s" % b64encode("%s:%s" % (user, password)))
-	try:
-		fh = urlopen(req)
-	except HTTPError as e:
-		if e.code == 401:
-			raise AuthenticationFailed
-		else
-			raise InternalError, e
-	# XXX leest dit alles?
-	return fh.read()
-
-def extract_zip(user, password):
-	# XXX move files to the right place
-	zipdata = download(user, password)
-	with ZipFile(zipdata, 'r') as zipf:
-		for fn in zipf.namelist():
-			# XXX
-
-if __name__ == '__main__':
-	print download('yourname', 'yourpass')
+class Configuration(object):
+    def __init__(self):
+        self.path = var_path('config.json')
+        if not os.path.exists(self.path):
+            self.data = {}
+        else:
+            try:
+                with open(self.path) as f:
+                    self.data = json.load(f)
+            except ValueError:
+                l.error("Failed to load configuration file.  Using empty one "+
+                        "instead.")
+                self.data = {}
+    def save(self):
+        with open(self.path, 'w') as f:
+            json.dump(self.data, f)
+    def __getitem__(self, k):
+        return self.data[k]
+    def __setitem__(self, k, v):
+        self.data[k] = v
+        self.save()
+    def __delitem__(self, k):
+        del self.data[k]
+        self.save()
+    def __contains__(self, k):
+        return k in self.data
