@@ -4,27 +4,24 @@ import os.path
 import platform
 import subprocess
 
-def var_path(pth):
+def base_path(pth):
     if not onWindows:
-        return os.path.abspath(os.path.join(os.getenv('HOME'), '.uiltje', pth))
+        return os.path.abspath(os.path.join(os.getcwd(), '..', pth))
     # Normal case
     if not sys.executable.endswith('pythonw.exe'):
         return os.path.abspath(os.path.join(os.path.dirname(sys.executable),
-                            'var', pth))
+                            pth))
     # For debugging
     return os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), '..',
-                        'var', pth))
+                        pth))
+
+def var_path(pth):
+    if not onWindows:
+        return os.path.abspath(os.path.join(os.getenv('HOME'), '.uiltje', pth))
+    return base_path(os.path.join('var', pth))
 
 def static_path(pth):
-    if not onWindows:
-        return os.path.abspath(os.path.join(os.getcwd(), '..', 'static', pth))
-    # Normal case
-    if not sys.executable.endswith('pythonw.exe'):
-        return os.path.join(os.path.abspath(os.path.dirname(sys.executable)),
-                            'static', pth)
-    # For debugging
-    return os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), '..',
-                        'static', pth))
+    return base_path(os.path.join('static', pth))
 
 def which(program):
     def is_exe(fpath):
@@ -40,6 +37,9 @@ def which(program):
             if is_exe(exe_file):
                 return exe_file
     return None
+
+def escapeshellarg(s):
+    return "'" + s.replace("'", "'\\''") + "'"
 
 onWindows = platform.system() == 'Windows'
 
