@@ -53,4 +53,3 @@ def _extract_zip(f):
 
 def fetch(username, password):
     _extract_zip(_download(username, password))
-    

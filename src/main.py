@@ -13,6 +13,7 @@ from utils import static_path, var_path, which, onWindows, subprocess_sui
 from openvpn import OpenVPNConnection
 from ui import Icon, LoginDialog
 from config import Configuration
+import fetchCert
 
 l = logging.getLogger(__name__)
 
@@ -79,8 +80,16 @@ class Program(object):
             self.set_state(STATE_DISCONNECTED)
             return
         self.set_state(STATE_CHECKING_CREDS)
-        print creds
+        try:
+            fetchCert.fetch(*creds)
+            self.config['got-creds'] = True
+        except fetchCert.AuthFailed:
+            self.set_state(STATE_PROMPTING_CREDS)
+            # TODO add notice that the credentials were wrong
+            LoginDialog(self._loginDialog_callback)
+            return
         self.set_state(STATE_UNKNOWN)
+        self._start_vpn_worker()
     def _start_vpn_worker(self):
             self.vpn_worker = threading.Thread(target=self._vpn_worker_entry)
             self.vpn_worker.start()
