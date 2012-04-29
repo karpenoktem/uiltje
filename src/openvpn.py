@@ -15,7 +15,10 @@ class OpenVPNConnection(object):
     def run(self):
         if onWindows:
             ensure_tap_installed()
-        self.p = subprocess.Popen([static_path('openvpn/openvpn'),
+            executable = static_path('openvpn/openvpn')
+        else:
+            executable = 'openvpn'
+        self.p = subprocess.Popen([executable,
                                    '--config', 'user.ovpn'],
                              cwd=var_path('user'),
                              stdout=subprocess.PIPE,

@@ -1,4 +1,4 @@
-IP_PHASSA = '10.18.0.1'
+SMB_HOSTNAME='files.vpn.karpenoktem.nl'
 
 STATE_UNKNOWN = 0
 STATE_CONNECTED = 1

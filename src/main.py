@@ -9,7 +9,7 @@ import subprocess
 
 from common import *
 
-from utils import static_path, var_path, onWindows, subprocess_sui
+from utils import static_path, var_path, which, onWindows, subprocess_sui
 from openvpn import OpenVPNConnection
 from ui import Icon, LoginDialog
 from config import Configuration
@@ -30,20 +30,20 @@ class Program(object):
         if onWindows:
             # For unknown reason, it can take quite some time before
             # "explorer \\10.18.0.1" works properly after connecting.
-            # We poll using "net view \\10.18.0.1" until we're connected.
+            # We poll using "net view \\SMB_HOSTNAME" until we're connected.
             # TODO is there a way to speed this up?
             while True:
                 l.info("calling 'net view'")
                 # WTF subprocess.Popen behaves differently than
                 # subprocess.call.  This difference only occurs with
                 # the custom startupinfo.
-                pipe = subprocess.Popen(['net', 'view', '\\\\' + IP_PHASSA],
+                pipe = subprocess.Popen(['net', 'view', '\\\\' + SMB_HOSTNAME],
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE,
                                         startupinfo=subprocess_sui)
-                out, code = pipe.communicate()
-                # WTF in some instances code != pipe.returncode.  Is this
-                # a bug of Python?
+                out, err = pipe.communicate()
+                if len(err) > 0:
+                    l.debug(err)
                 if pipe.returncode == 0:
                     break
                 l.debug("returncode: %s", pipe.returncode)
@@ -51,6 +51,8 @@ class Program(object):
                 if self.quiting:
                     return
         self.set_state(STATE_CONNECTED)
+        if not onWindows and which('gvfs-mount') is not None:
+            subprocess.call(['gvfs-mount', 'smb://'+ SMB_HOSTNAME])
         if self.open_files_on_connection:
             self._show_files()
             self.open_files_on_connection = False
@@ -102,8 +104,16 @@ class Program(object):
         if onWindows:
             l.info("calling explorer")
             # WTF adding startupinfo breaks this.
-            subprocess.call(['explorer', '\\\\' + IP_PHASSA])
-        # TODO implement for other platforms
+            subprocess.call(['explorer', '\\\\' + SMB_HOSTNAME])
+        else:
+            attempts = [['gnome-open', 'smb://'+ SMB_HOSTNAME], ['nautilus', 'smb://'+ SMB_HOSTNAME]]
+            for args in attempts:
+                exepath = which(args[0])
+                if exepath is not None:
+                    l.info("Starting %s", exepath)
+                    subprocess.call([exepath] + args[1:])
+                    return
+            l.warning("Could not found filebrowser")
     def toggle_connection(self):
         if self.state == STATE_CONNECTED:
             self.set_state(STATE_UNKNOWN)
