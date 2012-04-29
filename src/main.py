@@ -11,7 +11,8 @@ from common import *
 
 from utils import static_path, var_path, onWindows, subprocess_sui
 from openvpn import OpenVPNConnection
-from ui import Icon
+from ui import Icon, LoginDialog
+from config import Configuration
 
 l = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ class Program(object):
         self.open_files_on_connection = False
         self.quiting = False
         self.exit_event = threading.Event()
+        self.config = Configuration()
     def set_state(self, state):
         self.state = state
         if not self.quiting:
@@ -53,7 +55,6 @@ class Program(object):
             self._show_files()
             self.open_files_on_connection = False
     def _vpn_worker_entry(self):
-        self.set_state(STATE_UNKNOWN)
         self.vpnconn.run()
         self.set_state(STATE_DISCONNECTED)
     def on_exit(self):
@@ -65,8 +66,22 @@ class Program(object):
         self.exit_event.set()
     def connect(self):
         assert self.state == STATE_DISCONNECTED
-        self.vpn_worker = threading.Thread(target=self._vpn_worker_entry)
-        self.vpn_worker.start()
+        self.set_state(STATE_UNKNOWN)
+        if 'got-creds' not in self.config:
+            self.set_state(STATE_PROMPTING_CREDS)
+            LoginDialog(self._loginDialog_callback)
+        else:
+            self._start_vpn_worker()
+    def _loginDialog_callback(self, creds):
+        if creds is None:
+            self.set_state(STATE_DISCONNECTED)
+            return
+        self.set_state(STATE_CHECKING_CREDS)
+        print creds
+        self.set_state(STATE_UNKNOWN)
+    def _start_vpn_worker(self):
+            self.vpn_worker = threading.Thread(target=self._vpn_worker_entry)
+            self.vpn_worker.start()
     def main(self):
         self.app = wx.App()
         self.vpnconn = OpenVPNConnection(self.on_openvpn_connected)
@@ -105,4 +120,5 @@ if __name__ == '__main__':
         "%(asctime)s %(name)s %(levelname)s %(message)s")
     fileHandler.setFormatter(formatter)
     logging.root.addHandler(fileHandler)
-    Program().main()
+    p = Program()
+    p.main()

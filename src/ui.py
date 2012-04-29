@@ -10,27 +10,73 @@ MENU_FILES = wx.NewId()
 
 l = logging.getLogger(__name__)
 
+class LoginDialog(wx.Dialog):
+    def __init__(self, callback):
+        super(LoginDialog, self).__init__(None,
+                                          title="Uiltje login")
+        # Create controls
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        panel = wx.Panel(self)
+        grid = wx.GridSizer(rows=2, cols=2, hgap=5, vgap=5)
+        loginButton = wx.Button(self, label='Login')
+        loginButton.Bind(wx.EVT_BUTTON, self.on_login)
+        cancelButton = wx.Button(self, label='Cancel')
+        cancelButton.Bind(wx.EVT_BUTTON, self.on_cancel)
+        loginButton.SetDefault()
+        userName_l = wx.StaticText(panel, wx.ID_ANY, 'Gebruikersnaam')
+        password_l = wx.StaticText(panel, wx.ID_ANY, 'Wachtwoord')
+        userName_tb = wx.TextCtrl(panel)
+        password_tb = wx.TextCtrl(panel, style=wx.TE_PASSWORD)
+        grid.Add(userName_l)
+        grid.Add(userName_tb)
+        grid.Add(password_l)
+        grid.Add(password_tb)
+        panel.SetSizer(grid)
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+        hbox.Add(loginButton)
+        hbox.Add(cancelButton, flag=wx.LEFT, border=5)
+        vbox.Add(panel, proportion=1, flag=wx.ALL|wx.EXPAND, border=5)
+        vbox.Add(hbox, flag=wx.ALIGN_CENTER|wx.TOP|wx.BOTTOM, border=10)
+        self.SetSizerAndFit(vbox)
+
+        # Store
+        self.callback = callback
+        self.userName_tb = userName_tb
+        self.password_tb = password_tb
+
+        # Show!
+        self.ShowModal()
+    def on_login(self, e):
+        creds = (self.userName_tb.GetValue(),
+                 self.password_tb.GetValue())
+        self.Destroy()
+        self.callback(creds)
+    def on_cancel(self, e):
+        self.Destroy()
+        self.callback(None)
+
 class Icon(wx.TaskBarIcon):
     def __init__(self, program):
         super(Icon, self).__init__()
         self.icon_state_map = {
             STATE_CONNECTED: wx.Icon(static_path('enabled.png'),
                                      wx.BITMAP_TYPE_PNG),
-            STATE_UNKNOWN: wx.Icon(static_path('unknown.png'),
-                                   wx.BITMAP_TYPE_PNG),
             STATE_DISCONNECTED: wx.Icon(static_path('disabled.png'),
-                                        wx.BITMAP_TYPE_PNG) }
+                                        wx.BITMAP_TYPE_PNG),
+            None: wx.Icon(static_path('unknown.png'),
+                                   wx.BITMAP_TYPE_PNG) }
         self.create_menu()
         self.program = program
     def set_state(self, state):
-        self.SetIcon(self.icon_state_map[state], 'Uiltje')
+        self.SetIcon(self.icon_state_map.get(state,
+                        self.icon_state_map[None]), 'Uiltje')
         if state == STATE_CONNECTED:
             self.conn_toggle.Enable(True)
             self.conn_toggle.SetText('Verbreek &verbinding')
         elif state == STATE_DISCONNECTED:
             self.conn_toggle.Enable(True)
             self.conn_toggle.SetText('Maak &verbinding')
-        elif state == STATE_UNKNOWN:
+        else:
             self.conn_toggle.Enable(False)
             self.conn_toggle.SetText('Maak/verbreek &verbinding')
     def create_menu(self):
