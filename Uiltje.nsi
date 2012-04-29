@@ -15,10 +15,10 @@ Section
 	SetOutPath $INSTDIR
 	File /r /x dist\main\var dist\main\*
 	WriteUninstaller $INSTDIR\uninstaller.exe
-	CreateShortCut "$DESKTOP\Uiltje.lnk" "$INSTDIR\main.exe"
+	CreateShortCut "$DESKTOP\Uiltje.lnk" "$INSTDIR\uiltje.exe"
 	CreateDirectory "$SMPROGRAMS\Uiltje"
 	CreateShortCut "$SMPROGRAMS\Uiltje\Uiltje.lnk" \
-							"$INSTDIR\main.exe"
+							"$INSTDIR\uiltje.exe"
 	CreateShortCut "$SMPROGRAMS\Uiltje\Verwijder Uiltje.lnk" \
 							"$INSTDIR\uninstaller.exe"
 SectionEnd
@@ -30,5 +30,5 @@ Section "Uninstall"
 SectionEnd
 
 Function .onInstSuccess
-	Exec $INSTDIR\main.exe
+	Exec $INSTDIR\uiltje.exe
 FunctionEnd
