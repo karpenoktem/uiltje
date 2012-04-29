@@ -30,8 +30,8 @@ exe = EXE(pyz,
           name=os.path.join('build\\pyi.win32\\main', 'main.exe'),
           debug=False,
           strip=None,
-          upx=False,
-          console=True )
+          upx=True,
+          console=False )
 
 datas += a.datas
 
