@@ -28,14 +28,14 @@ class Program(object):
         if onWindows:
             # For unknown reason, it can take quite some time before
             # "explorer \\10.18.0.1" works properly after connecting.
-            # We poll using "net view \\10.18.0.1" until we're connected.
+            # We poll using "net view \\SMB_HOSTNAME" until we're connected.
             # TODO is there a way to speed this up?
             while True:
                 l.info("calling 'net view'")
                 # WTF subprocess.Popen behaves differently than
                 # subprocess.call.  This difference only occurs with
                 # the custom startupinfo.
-                pipe = subprocess.Popen(['net', 'view', '\\\\' + IP_PHASSA],
+                pipe = subprocess.Popen(['net', 'view', '\\\\' + SMB_HOSTNAME],
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE,
                                         startupinfo=subprocess_sui)
@@ -87,8 +87,8 @@ class Program(object):
         if onWindows:
             l.info("calling explorer")
             # WTF adding startupinfo breaks this.
-            subprocess.call(['explorer', '\\\\' + IP_PHASSA])
         # TODO implement for other platforms
+            subprocess.call(['explorer', '\\\\' + SMB_HOSTNAME])
     def toggle_connection(self):
         if self.state == STATE_CONNECTED:
             self.set_state(STATE_UNKNOWN)
