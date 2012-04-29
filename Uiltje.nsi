@@ -6,8 +6,8 @@
 !include "SE.nsh"
 
 ${SE-HeadingLine1} 		"Uiltje"
-${SE-HeadingLine2} 		"versie 2"
-${SE-Product}			"Uiltje versie 2"
+${SE-HeadingLine2} 		"versie 3"
+${SE-Product}			"Uiltje versie 3"
 
 ${SE-OutFile}			"Uiltje.exe"
 ${SE-ExtractDir}		"$PROGRAMFILES\Uiltje"
