@@ -148,6 +148,8 @@ class Program(object):
             self.connect()
 
 if __name__ == '__main__':
+    if not os.path.exists(var_path('')):
+        os.mkdir(var_path(''))
     logging.basicConfig(level=logging.DEBUG)
     fileHandler = logging.FileHandler(var_path('log.txt'), mode='a')
     formatter = logging.Formatter(
