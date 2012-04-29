@@ -22,6 +22,7 @@ def _download(username, password):
     try:
         fh = urllib2.urlopen(req)
     except urllib2.HTTPError as e:
+        # FIXME The server apparently returns a 500 on a nonexistent username
         if e.code == 401:
             raise AuthFailed
         raise e
