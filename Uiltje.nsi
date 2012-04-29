@@ -1,30 +1,34 @@
 ; We use NSIS
 ;   http://nsis.sourceforge.net/
-; and its Self-Extractor Kit
-;   http://nsis.sourceforge.net/NSIS_Self-Extractor_kit
 
-!include "SE.nsh"
+!define version "beta 3"
 
-${SE-HeadingLine1} 		"Uiltje"
-${SE-HeadingLine2} 		"versie 3"
-${SE-Product}			"Uiltje versie 3"
+RequestExecutionLevel admin
+InstallDir "$PROGRAMFILES\Uiltje"
+OutFile "Uiltje ${version}.exe"
+Icon "uiltje.ico"
+AutoCloseWindow true
+ShowInstDetails show
+ShowUninstDetails show
 
-${SE-OutFile}			"Uiltje.exe"
-${SE-ExtractDir}		"$PROGRAMFILES\Uiltje"
-${SE-AutoClose}
-${SE-ExtractList}       show
-${SE-ExecOnClose}
-${SE-ExecCheckBox}      "$INSTDIR\main.exe" "Start Uiltje na installatie"
+Section
+	SetOutPath $INSTDIR
+	File /r /x dist\main\var dist\main\*
+	WriteUninstaller $INSTDIR\uninstaller.exe
+	CreateShortCut "$DESKTOP\Uiltje.lnk" "$INSTDIR\main.exe"
+	CreateDirectory "$SMPROGRAMS\Uiltje"
+	CreateShortCut "$SMPROGRAMS\Uiltje\Uiltje.lnk" \
+							"$INSTDIR\main.exe"
+	CreateShortCut "$SMPROGRAMS\Uiltje\Verwijder Uiltje.lnk" \
+							"$INSTDIR\uninstaller.exe"
+SectionEnd
 
-;- Files to extract
-${SE-FilesStart}
+Section "Uninstall"
+	RMDir /r $INSTDIR
+	RMDir /r "$SMPROGRAMS\Uiltje"
+	Delete $DESKTOP\Uiltje.lnk
+SectionEnd
 
- ${SE-OutPath} "$INSTDIR"
-  ${SE-AddDir} "dist\main" r
-
-${SE-FilesEnd}
-
-${SE-ShortcutsStart}
- ${SE-OutPath} "$SMPROGRAMS"
-  ${SE-Shortcut} "$SMPROGRAMS\Uiltje.lnk" "$INSTDIR\main.exe"
-${SE-ShortcutsEnd}
+Function .onInstSuccess
+	Exec $INSTDIR\main.exe
+FunctionEnd
