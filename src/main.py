@@ -43,11 +43,10 @@ class Program(object):
                                         stderr=subprocess.PIPE,
                                         startupinfo=subprocess_sui)
                 out, err = pipe.communicate()
-                if len(err) > 0:
-                    l.debug(err)
-                if pipe.returncode == 0:
+                if pipe.returncode == 0 or 'Access is denied.' in err:
                     break
                 l.debug("returncode: %s", pipe.returncode)
+                l.debug("Message: %s",  repr(err))
                 time.sleep(0.5)
                 if self.quiting:
                     return
